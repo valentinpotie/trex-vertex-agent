@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TREX Assistant - Démo</title>
+    <title>TREX Dashboard & Assistant</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
+        body, html {
+            height: 100%;
             margin: 0;
             padding: 0;
+            font-family: 'Roboto', sans-serif;
             background-color: #F5F7FA;
             color: #333;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
@@ -23,6 +26,7 @@
             display: flex;
             align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
 
         .logo {
@@ -40,44 +44,72 @@
         }
 
         main {
-            padding: 4rem 2rem;
-            max-width: 800px;
+            flex-grow: 1;
+            padding: 1.5rem;
+            /* C'est ici que j'ai élargi la zone : 98% de la largeur de l'écran */
+            max-width: 70%; 
             margin: 0 auto;
-            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
         h1 {
             color: #3643BA;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
+            margin-top: 0;
+        }
+        
+        p.intro {
+            margin-bottom: 1.5rem;
+            color: #666;
         }
 
-        .card {
+        /* Style pour l'intégration Google Sheets */
+        .sheet-container {
+            flex-grow: 1;
             background: white;
-            padding: 2rem;
+            padding: 0.5rem; /* Réduit un peu le padding pour gagner de la place */
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-top: 2rem;
-            text-align: left;
+            display: flex;
+            flex-direction: column;
+            min-height: 600px; /* Augmenté un peu la hauteur mini */
         }
 
-        code {
-            background-color: #eee;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: monospace;
+        iframe.sheet-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            flex-grow: 1;
         }
 
-        /* --- STYLES SPECIFIQUES DU MESSENGER --- */
+        /* --- STYLES PERSONNALISÉS DU MESSENGER (Decathlon Theme) --- */
         df-messenger {
             z-index: 999;
             position: fixed;
-            --df-messenger-font-color: #000;
-            --df-messenger-font-family: Google Sans;
-            --df-messenger-chat-background: #FFFFFF;
-            --df-messenger-message-user-background: #3643BA; /* Bleu Decathlon */
-            --df-messenger-message-bot-background: #FFFFFF;
             bottom: 16px;
             right: 16px;
+
+            /* Fontes et Couleurs Générales */
+            --df-messenger-font-color: #333;
+            --df-messenger-font-family: 'Roboto', sans-serif;
+            --df-messenger-chat-background: #FFFFFF;
+
+            /* Message Utilisateur : Fond Bleu Decathlon, Texte BLANC */
+            --df-messenger-message-user-background: #3643BA;
+            --df-messenger-message-user-font-color: #FFFFFF;
+
+            /* Message Bot */
+            --df-messenger-message-bot-background: #F0F0F0;
+            
+            /* Barre de titre (Header du chat) */
+            --df-messenger-titlebar-background: #3643BA;
+            --df-messenger-titlebar-font-color: #FFFFFF;
+            
+            /* Couleur du bouton d'envoi */
+            --df-messenger-send-icon-color: #3643BA;
         }
     </style>
 
@@ -88,21 +120,18 @@
 
     <header>
         <div class="logo">DECATHLON</div>
-        <div class="subtitle">LTC - TREX Product Team</div>
+        <div class="subtitle">TREX Team</div>
     </header>
 
     <main>
-                <h1>Bienvenue sur le portail TREX</h1>
-        <p>Transport Referencing Experience - Master Data Management</p>
+        <h1>Referenced Data</h1>
+        <p class="intro">See below the transport data. You can, as a buyer, edit it by clicking on the chat icon</p>
 
-        <div class="card">
-            <h2>Instructions</h2>
-            <p>Cette page sert de démonstration pour l'intégration de l'agent virtuel <strong>TREX Assistant</strong>.</p>
-            <ul>
-                <li>L'agent est connecté au projet : <code>trex-479915</code></li>
-                <li>Environnement : <code>europe-west3</code></li>
-            </ul>
-            <p>Cliquez sur la bulle en bas à droite pour interagir avec l'assistant PM.</p>
+        <div class="sheet-container">
+            <iframe 
+                class="sheet-frame"
+                src="https://docs.google.com/spreadsheets/d/15UCltMa8JNHpplVjJz84gniSHbilZ2YViCqvoaHw4kY/preview?widget=true&amp;headers=false">
+            </iframe>
         </div>
     </main>
 
@@ -112,10 +141,13 @@
         agent-id="dbe77390-1e12-4cb1-b336-4ca2d2c51935"
         language-code="en"
         max-query-length="-1">
+        
         <df-messenger-chat-bubble
             chat-title="TREX Assistant"
-            chat-title-icon="https://observatoireduwokisme.fr/wp-content/uploads/2025/02/decathlon-logo.png">
+            chat-title-icon="https://observatoireduwokisme.fr/wp-content/uploads/2025/02/decathlon-logo.png"
+            bot-actor-image="https://observatoireduwokisme.fr/wp-content/uploads/2025/02/decathlon-logo.png">
         </df-messenger-chat-bubble>
+        
     </df-messenger>
 
 </body>
