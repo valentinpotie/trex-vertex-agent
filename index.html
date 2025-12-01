@@ -55,7 +55,7 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            transition: max-width 0.4s ease-in-out; /* Animation fluide */
+            transition: max-width 0.4s ease-in-out;
         }
 
         /* En-tête de la zone principale */
@@ -83,10 +83,44 @@
         .controls-wrapper {
             display: flex;
             align-items: center;
-            gap: 15px; /* Espace entre l'icône refresh et les boutons width */
+            gap: 20px; /* Espace plus large pour bien séparer les groupes */
         }
 
-        /* --- BOUTON REFRESH (ICÔNE) --- */
+        /* --- BOUTON TEXTUEL CLEAN (Restart Chat) --- */
+        .restart-chat-btn {
+            background: white;
+            border: 1px solid #ddd;
+            color: #666;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .restart-chat-btn:hover {
+            border-color: #3643BA;
+            color: #3643BA;
+            background-color: #f9f9ff;
+        }
+        
+        .restart-chat-btn:active {
+            transform: translateY(1px);
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background-color: #ddd;
+            margin: 0 5px;
+        }
+
+        /* --- BOUTON REFRESH DATA (ICÔNE) --- */
         .refresh-icon-btn {
             background: none;
             border: none;
@@ -97,18 +131,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #3643BA;
+            font-size: 1.2rem;
         }
 
         .refresh-icon-btn:hover {
             background-color: #e0e0e0;
         }
 
-        .refresh-icon-btn i {
-            color: #3643BA; /* Bleu Decathlon */
-            font-size: 1.2rem;
-        }
-
-        /* Animation de rotation */
         .spinning {
             animation: spin 1s linear infinite;
         }
@@ -118,7 +148,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* --- CONTROLES DE LARGEUR (SEGMENTED CONTROL) --- */
+        /* --- CONTROLES DE LARGEUR --- */
         .view-controls {
             display: flex;
             background-color: #e0e0e0;
@@ -178,24 +208,16 @@
             position: fixed;
             bottom: 16px;
             right: 16px;
-
-            /* Fontes et Couleurs Générales */
             --df-messenger-font-color: #333;
             --df-messenger-font-family: 'Roboto', sans-serif;
             --df-messenger-chat-background: #FFFFFF;
-
-            /* Message Utilisateur : Fond Bleu Decathlon, Texte BLANC */
             --df-messenger-message-user-background: #3643BA;
             --df-messenger-message-user-font-color: #FFFFFF;
-
-            /* Message Bot */
             --df-messenger-message-bot-background: #F0F0F0;
             
-            /* --- HEADER CHAT (BLANC + TEXTE NOIR POUR LOGO BLEU) --- */
+            /* Logo Bleu -> Fond blanc, texte noir */
             --df-messenger-titlebar-background: #FFFFFF;
             --df-messenger-titlebar-font-color: #000000;
-            
-            /* Couleur du bouton d'envoi */
             --df-messenger-send-icon-color: #3643BA;
         }
     </style>
@@ -219,6 +241,13 @@
             </div>
 
             <div class="controls-wrapper">
+                
+                <button class="restart-chat-btn" onclick="resetChat()" title="Clear history and start fresh">
+                    Restart Assistant
+                </button>
+
+                <div class="separator"></div>
+
                 <button class="refresh-icon-btn" onclick="manualRefresh(this)" title="Force refresh data">
                     <i class="fas fa-sync"></i>
                 </button>
@@ -256,44 +285,38 @@
     </df-messenger>
 
     <script>
-        // --- GESTION DE LA LARGEUR ---
+        // --- 1. GESTION DU RESET CHAT ---
+        function resetChat() {
+            // Confirmation simple pour éviter les clics par erreur
+            if(confirm("Start a new conversation with the Assistant?")) {
+                sessionStorage.clear();
+                window.location.reload();
+            }
+        }
+
+        // --- 2. GESTION DE LA LARGEUR ---
         function setViewMode(width, btnElement) {
-            // Applique la largeur
             document.getElementById('main-container').style.maxWidth = width;
-            
-            // Gestion des classes actives sur les boutons
-            const buttons = document.querySelectorAll('.view-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
         }
 
-        // --- GESTION DU RAFRAICHISSEMENT ---
+        // --- 3. GESTION DU RAFRAICHISSEMENT DONNÉES ---
         const iframe = document.getElementById('trex-sheet');
         const baseUrl = "https://docs.google.com/spreadsheets/d/15UCltMa8JNHpplVjJz84gniSHbilZ2YViCqvoaHw4kY/preview?widget=true&headers=false";
 
-        // Recharge l'iframe avec cache buster
         function reloadIframe() {
             const timestamp = new Date().getTime();
             iframe.src = baseUrl + "&cache_buster=" + timestamp;
         }
 
-        // Action manuelle (Clic icône)
         function manualRefresh(btnElement) {
             const icon = btnElement.querySelector('i');
-            
-            // Animation
             icon.classList.add('spinning');
-            
-            // Action
             reloadIframe();
-
-            // Stop animation après 1s
-            setTimeout(() => {
-                icon.classList.remove('spinning');
-            }, 1000);
+            setTimeout(() => { icon.classList.remove('spinning'); }, 1000);
         }
 
-        // Action Automatique (toutes les 30s)
         setInterval(reloadIframe, 30000); 
     </script>
 
