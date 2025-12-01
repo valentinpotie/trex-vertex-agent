@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TREX Dashboard & Assistant</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body, html {
@@ -19,6 +20,7 @@
             flex-direction: column;
         }
 
+        /* --- HEADER GLOBAL --- */
         header {
             background-color: #3643BA; /* Bleu Decathlon */
             color: white;
@@ -43,39 +45,124 @@
             padding-left: 20px;
         }
 
+        /* --- MAIN CONTAINER --- */
         main {
             flex-grow: 1;
             padding: 1.5rem;
-            /* C'est ici que j'ai élargi la zone : 98% de la largeur de l'écran */
-            max-width: 70%; 
+            max-width: 70%; /* Largeur par défaut */
             margin: 0 auto;
             width: 100%;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            transition: max-width 0.4s ease-in-out; /* Animation fluide */
         }
 
-        h1 {
+        /* En-tête de la zone principale */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .text-content h1 {
             color: #3643BA;
             margin-bottom: 0.5rem;
             margin-top: 0;
         }
         
-        p.intro {
-            margin-bottom: 1.5rem;
+        .text-content p.intro {
+            margin: 0;
             color: #666;
         }
 
-        /* Style pour l'intégration Google Sheets */
+        /* Wrapper pour regrouper les contrôles à droite */
+        .controls-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Espace entre l'icône refresh et les boutons width */
+        }
+
+        /* --- BOUTON REFRESH (ICÔNE) --- */
+        .refresh-icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .refresh-icon-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .refresh-icon-btn i {
+            color: #3643BA; /* Bleu Decathlon */
+            font-size: 1.2rem;
+        }
+
+        /* Animation de rotation */
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- CONTROLES DE LARGEUR (SEGMENTED CONTROL) --- */
+        .view-controls {
+            display: flex;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .view-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.85rem;
+            color: #555;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .view-btn:hover {
+            color: #000;
+            background-color: rgba(255,255,255,0.5);
+        }
+
+        .view-btn.active {
+            background-color: white;
+            color: #3643BA;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-weight: 700;
+        }
+
+        /* --- IFRAME CONTAINER --- */
         .sheet-container {
             flex-grow: 1;
             background: white;
-            padding: 0.5rem; /* Réduit un peu le padding pour gagner de la place */
+            padding: 0.5rem;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            min-height: 600px; /* Augmenté un peu la hauteur mini */
+            min-height: 600px;
+            position: relative;
         }
 
         iframe.sheet-frame {
@@ -85,7 +172,7 @@
             flex-grow: 1;
         }
 
-        /* --- STYLES PERSONNALISÉS DU MESSENGER (Decathlon Theme) --- */
+        /* --- STYLE DU MESSENGER (CUSTOM DECATHLON) --- */
         df-messenger {
             z-index: 999;
             position: fixed;
@@ -104,9 +191,9 @@
             /* Message Bot */
             --df-messenger-message-bot-background: #F0F0F0;
             
-            /* Barre de titre (Header du chat) */
-            --df-messenger-titlebar-background: #3643BA;
-            --df-messenger-titlebar-font-color: #FFFFFF;
+            /* --- HEADER CHAT (BLANC + TEXTE NOIR POUR LOGO BLEU) --- */
+            --df-messenger-titlebar-background: #FFFFFF;
+            --df-messenger-titlebar-font-color: #000000;
             
             /* Couleur du bouton d'envoi */
             --df-messenger-send-icon-color: #3643BA;
@@ -123,12 +210,30 @@
         <div class="subtitle">TREX Team</div>
     </header>
 
-    <main>
-        <h1>Referenced Data</h1>
-        <p class="intro">See below the transport data. You can, as a buyer, edit it by clicking on the chat icon</p>
+    <main id="main-container">
+        
+        <div class="main-header">
+            <div class="text-content">
+                <h1>Referenced Data</h1>
+                <p class="intro">See below the transport data. You can, as a buyer, edit it by clicking on the chat icon</p>
+            </div>
+
+            <div class="controls-wrapper">
+                <button class="refresh-icon-btn" onclick="manualRefresh(this)" title="Force refresh data">
+                    <i class="fas fa-sync"></i>
+                </button>
+                
+                <div class="view-controls">
+                    <button class="view-btn active" onclick="setViewMode('70%', this)">Standard</button>
+                    <button class="view-btn" onclick="setViewMode('90%', this)">Wide</button>
+                    <button class="view-btn" onclick="setViewMode('98%', this)">Full</button>
+                </div>
+            </div>
+        </div>
 
         <div class="sheet-container">
             <iframe 
+                id="trex-sheet"
                 class="sheet-frame"
                 src="https://docs.google.com/spreadsheets/d/15UCltMa8JNHpplVjJz84gniSHbilZ2YViCqvoaHw4kY/preview?widget=true&amp;headers=false">
             </iframe>
@@ -144,11 +249,53 @@
         
         <df-messenger-chat-bubble
             chat-title="TREX Assistant"
-            chat-title-icon="https://observatoireduwokisme.fr/wp-content/uploads/2025/02/decathlon-logo.png"
-            bot-actor-image="https://observatoireduwokisme.fr/wp-content/uploads/2025/02/decathlon-logo.png">
+            chat-title-icon="decathlon_blue_logo.jpg"
+            bot-actor-image="decathlon_blue_logo.jpg">
         </df-messenger-chat-bubble>
         
     </df-messenger>
+
+    <script>
+        // --- GESTION DE LA LARGEUR ---
+        function setViewMode(width, btnElement) {
+            // Applique la largeur
+            document.getElementById('main-container').style.maxWidth = width;
+            
+            // Gestion des classes actives sur les boutons
+            const buttons = document.querySelectorAll('.view-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
+        // --- GESTION DU RAFRAICHISSEMENT ---
+        const iframe = document.getElementById('trex-sheet');
+        const baseUrl = "https://docs.google.com/spreadsheets/d/15UCltMa8JNHpplVjJz84gniSHbilZ2YViCqvoaHw4kY/preview?widget=true&headers=false";
+
+        // Recharge l'iframe avec cache buster
+        function reloadIframe() {
+            const timestamp = new Date().getTime();
+            iframe.src = baseUrl + "&cache_buster=" + timestamp;
+        }
+
+        // Action manuelle (Clic icône)
+        function manualRefresh(btnElement) {
+            const icon = btnElement.querySelector('i');
+            
+            // Animation
+            icon.classList.add('spinning');
+            
+            // Action
+            reloadIframe();
+
+            // Stop animation après 1s
+            setTimeout(() => {
+                icon.classList.remove('spinning');
+            }, 1000);
+        }
+
+        // Action Automatique (toutes les 30s)
+        setInterval(reloadIframe, 30000); 
+    </script>
 
 </body>
 </html>
