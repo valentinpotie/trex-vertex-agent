@@ -49,7 +49,7 @@
         main {
             flex-grow: 1;
             padding: 1.5rem;
-            max-width: 70%; /* Largeur par défaut */
+            max-width: 70%;
             margin: 0 auto;
             width: 100%;
             box-sizing: border-box;
@@ -58,7 +58,6 @@
             transition: max-width 0.4s ease-in-out;
         }
 
-        /* En-tête de la zone principale */
         .main-header {
             display: flex;
             justify-content: space-between;
@@ -83,14 +82,14 @@
         .controls-wrapper {
             display: flex;
             align-items: center;
-            gap: 20px; /* Espace plus large pour bien séparer les groupes */
+            gap: 15px;
         }
 
-        /* --- BOUTON TEXTUEL CLEAN (Restart Chat) --- */
-        .restart-chat-btn {
+        /* --- BOUTONS TEXTUELS (Restart & How it works) --- */
+        .text-btn {
             background: white;
             border: 1px solid #ddd;
-            color: #666;
+            color: #555;
             padding: 6px 16px;
             border-radius: 4px;
             font-family: 'Roboto', sans-serif;
@@ -101,16 +100,18 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            text-decoration: none;
         }
 
-        .restart-chat-btn:hover {
+        .text-btn:hover {
             border-color: #3643BA;
             color: #3643BA;
             background-color: #f9f9ff;
         }
-        
-        .restart-chat-btn:active {
-            transform: translateY(1px);
+
+        /* Style spécifique pour le bouton Info (plus neutre) */
+        .info-btn {
+            margin-right: 5px;
         }
 
         .separator {
@@ -120,7 +121,7 @@
             margin: 0 5px;
         }
 
-        /* --- BOUTON REFRESH DATA (ICÔNE) --- */
+        /* --- BOUTON REFRESH DATA --- */
         .refresh-icon-btn {
             background: none;
             border: none;
@@ -182,7 +183,7 @@
             font-weight: 700;
         }
 
-        /* --- IFRAME CONTAINER --- */
+        /* --- IFRAME --- */
         .sheet-container {
             flex-grow: 1;
             background: white;
@@ -202,20 +203,110 @@
             flex-grow: 1;
         }
 
-        /* --- STYLE DU MESSENGER (CUSTOM DECATHLON) --- */
+        /* --- MODAL STYLES --- */
+        .modal-overlay {
+            display: none; /* Caché par défaut */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Fond sombre semi-transparent */
+            z-index: 2000; /* Au dessus de tout, même du chat */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px); /* Petit effet de flou moderne */
+        }
+
+        .modal-container {
+            background-color: white;
+            width: 90%;
+            max-width: 650px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh; /* Pour ne pas dépasser l'écran */
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #3643BA;
+            font-size: 1.25rem;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .close-modal-btn:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto; /* Scroll si le texte est trop long */
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* Styles spécifiques au contenu technique */
+        .tech-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .tech-section h4 {
+            color: #3643BA;
+            margin-bottom: 0.8rem;
+            margin-top: 0;
+            font-size: 1.1rem;
+        }
+
+        .tech-section ul {
+            padding-left: 20px;
+            margin-top: 0.5rem;
+            list-style-type: disc;
+        }
+
+        .tech-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-divider {
+            height: 1px;
+            background-color: #eee;
+            border: none;
+            margin: 1.5rem 0;
+        }
+
+        /* --- MESSENGER --- */
         df-messenger {
             z-index: 999;
             position: fixed;
             bottom: 16px;
             right: 16px;
+            --df-messenger-chat-window-width: 500px;
+            --df-messenger-chat-window-height: 650px;
             --df-messenger-font-color: #333;
             --df-messenger-font-family: 'Roboto', sans-serif;
             --df-messenger-chat-background: #FFFFFF;
             --df-messenger-message-user-background: #3643BA;
             --df-messenger-message-user-font-color: #FFFFFF;
             --df-messenger-message-bot-background: #F0F0F0;
-            
-            /* Logo Bleu -> Fond blanc, texte noir */
             --df-messenger-titlebar-background: #FFFFFF;
             --df-messenger-titlebar-font-color: #000000;
             --df-messenger-send-icon-color: #3643BA;
@@ -233,7 +324,6 @@
     </header>
 
     <main id="main-container">
-        
         <div class="main-header">
             <div class="text-content">
                 <h1>Referenced Data</h1>
@@ -242,7 +332,11 @@
 
             <div class="controls-wrapper">
                 
-                <button class="restart-chat-btn" onclick="resetChat()" title="Clear history and start fresh">
+                <button class="text-btn info-btn" onclick="openModal()">
+                    <i class="far fa-question-circle"></i> How it works?
+                </button>
+
+                <button class="text-btn" onclick="resetChat()" title="Clear history and start fresh">
                     Restart Assistant
                 </button>
 
@@ -269,6 +363,53 @@
         </div>
     </main>
 
+    <div id="technicalModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Technical Overview</h2>
+                <button class="close-modal-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    This prototype demonstrates a <strong>Human-in-the-Loop (HITL)</strong> workflow for managing transport data via natural language. It leverages Generative AI to orchestrate read/write operations securely.
+                </p>
+            
+                <div class="tech-divider"></div>
+            
+                <div class="tech-section">
+                    <h4>1. Current Architecture (POC)</h4>
+                    <p>The system operates on a serverless architecture optimized for rapid prototyping:</p>
+                    <ul>
+                        <li><strong>AI Orchestrator:</strong> Google Vertex AI Agent Builder powered by <code>Gemini 1.5 Flash</code> for low-latency reasoning.</li>
+                        <li><strong>Middleware:</strong> A Google Apps Script deployed as a Web App acts as the API Gateway. It parses JSON payloads to determine intent (<code>search</code> vs <code>update</code>).</li>
+                        <li><strong>Database & UI:</strong> Google Sheets serves as the mutable database. The script performs real-time DOM manipulation (highlighting updated cells in yellow) to provide immediate visual feedback in the frontend.</li>
+                    </ul>
+                </div>
+            
+                <div class="tech-section">
+                    <h4>2. Workflow Logic & Security</h4>
+                    <p>The agent does not hallucinate SQL. It follows a strict <strong>Function Calling</strong> protocol defined via OpenAPI 3.0:</p>
+                    <ul>
+                        <li><strong>Intent Detection:</strong> The LLM extracts parameters (Carrier, Origin, Destination, Percentage) from user input.</li>
+                        <li><strong>Safety Layer:</strong> System instructions enforce a strict validation loop. The <code>update</code> action is cryptographically blocked until the user explicitly confirms the simulation results.</li>
+                    </ul>
+                </div>
+            
+                <div class="tech-divider"></div>
+            
+                <div class="tech-section">
+                    <h4>3. Production Target Architecture</h4>
+                    <p>For the production environment, the stack will migrate to ensure scalability and ACID compliance:</p>
+                    <ul>
+                        <li><strong>Database:</strong> Migration from Sheets to <strong>PostgreSQL</strong> (Cloud SQL) to handle concurrent writes and large datasets.</li>
+                        <li><strong>Backend:</strong> Replacement of Apps Script with a dedicated <strong>Python (FastAPI)</strong> service.</li>
+                        <li><strong>Auditability:</strong> Implementation of a dedicated <code>audit_log</code> table to track every AI-initiated change for compliance.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <df-messenger
         location="europe-west3"
         project-id="trex-479915"
@@ -285,23 +426,38 @@
     </df-messenger>
 
     <script>
-        // --- 1. GESTION DU RESET CHAT ---
+        // --- 1. MODAL LOGIC ---
+        function openModal() {
+            document.getElementById('technicalModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('technicalModal').style.display = 'none';
+        }
+
+        // Fermer si on clique en dehors de la boite blanche
+        function closeModalOnOverlay(event) {
+            if (event.target === document.getElementById('technicalModal')) {
+                closeModal();
+            }
+        }
+
+        // --- 2. RESET CHAT ---
         function resetChat() {
-            // Confirmation simple pour éviter les clics par erreur
             if(confirm("Start a new conversation with the Assistant?")) {
                 sessionStorage.clear();
                 window.location.reload();
             }
         }
 
-        // --- 2. GESTION DE LA LARGEUR ---
+        // --- 3. VIEW MODE ---
         function setViewMode(width, btnElement) {
             document.getElementById('main-container').style.maxWidth = width;
             document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
         }
 
-        // --- 3. GESTION DU RAFRAICHISSEMENT DONNÉES ---
+        // --- 4. DATA REFRESH ---
         const iframe = document.getElementById('trex-sheet');
         const baseUrl = "https://docs.google.com/spreadsheets/d/15UCltMa8JNHpplVjJz84gniSHbilZ2YViCqvoaHw4kY/preview?widget=true&headers=false";
 
